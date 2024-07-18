@@ -1,0 +1,14 @@
+name: mygisapp
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - gdal
+  - fastapi
+  - uvicorn
+  - pydantic
+  - pytest
+  - rasterio
+  - pysheds
+  - numpy
