@@ -1,15 +1,14 @@
 from fastapi import APIRouter, HTTPException
-from schemas import CoordinateSchema
-from app.utils.function_watershed import delineate_watershed
-
+from schemas import CoordinateSchema, RasterModel
+from utils.function_watershed import delineate_watershed
 
 router = APIRouter()
 
-@router.post('/delineate', response_model=dict)
+@router.post('/delineate', response_model=RasterModel)
 async def delineate_watershed_route(coordinates: CoordinateSchema):
     """
     Delimita la cuenca hidrográfica a partir de un punto dado (latitud, longitud).
-    
+
     :param coordinates: CoordinateSchema, latitud y longitud del punto de interés
     :return: dict, información de la cuenca delimitada o error
     """
