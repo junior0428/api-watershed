@@ -252,3 +252,11 @@ $RECYCLE.BIN/
 
 # O si prefieres ignorar todos los archivos TIF en ciertos directorios
 data/**/*.tif
+
+# Ignorar archivos TIF específicos
+data/dem200m/Direction_200.tif
+data/dem200m/MDT_200.tif
+data/flow_accumulation.tif
+data/flow_fdir.tif
+data/guadiana_wgs84.tif
+data/dem200m/Accumulation_200.tif
