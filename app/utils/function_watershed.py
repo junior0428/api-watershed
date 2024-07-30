@@ -21,16 +21,16 @@ def delineate_watershed(latitude, longitude):
              los puntos máximo y mínimo, y la longitud del río
     """
     try:
-        with rasterio.open('/home/tidop/2024/usal/tidop/github/api-watershed/data/guadiana_wgs84.tif') as src:
+        with rasterio.open('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif') as src:
             dem = src.read(1)
             transform = src.transform
             # Leer el raster de elevación
-            grid = Grid.from_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/guadiana_wgs84.tif')
-            dem = grid.read_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/guadiana_wgs84.tif')
+            grid = Grid.from_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
+            dem = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
             # Determinar las direcciones de flujo D8 a partir del DEM
-            fdir = grid.read_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/flow_fdir.tif')
+            fdir = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_fdir.tif')
             # Acumulación de flujo
-            acc = grid.read_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/flow_accumulation.tif')
+            acc = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_accumulation.tif')
 
         dirmap = (64, 128, 1, 2, 4, 8, 16, 32)
         # Delimitar una cuenca
@@ -54,7 +54,7 @@ def delineate_watershed(latitude, longitude):
         clipped_catch = json.loads(clipped_catch.to_json())
     
         # Extraer la red de ríos
-        branches = grid.extract_river_network(fdir, acc > 500, dirmap=dirmap)
+        branches = grid.extract_river_network(fdir, acc > 50000, dirmap=dirmap)
         
         # Tamaño del píxel a partir de la transformación afín
         affine = grid.affine

@@ -11,11 +11,15 @@ from rasterio.features import shapes
 from shapely.geometry import shape
 import json
 
-grid = Grid.from_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/guadiana_wgs84.tif')
-dem = grid.read_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/guadiana_wgs84.tif')
+with rasterio.open('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif') as src:
+    transform = src.transform
+    data = src.read(1)  # Leer los datos del DEM
 
-direc = grid.read_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/flow_fdir.tif')
-acumula = grid.read_raster('/home/tidop/2024/usal/tidop/github/api-watershed/data/flow_accumulation.tif')
+grid = Grid.from_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
+dem = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
+
+direc = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_fdir.tif')
+acumula = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_accumulation.tif')
 dirmap = (64, 128, 1, 2, 4, 8, 16, 32)
 
 x, y = -4.758253, 38.491025
@@ -31,7 +35,7 @@ catch = grid.catchment(x=x_snap, y=y_snap, fdir=direc, dirmap=dirmap,
 # Clip the bounding box to the catchment
 grid.clip_to(catch)
 clipped_catch = grid.view(catch)
-print(catch)
+print(clipped_catch)
 
 # raster to geojson
 # -----------------

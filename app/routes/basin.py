@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
-from schemas import CoordinateSchema, RasterModel
+from schemas import CoordinateSchema, CatchmentResponse
 from utils.function_watershed import delineate_watershed
 
 router = APIRouter()
 
-@router.post('/delineate', response_model=RasterModel)
+@router.post('/delineation', response_model=CatchmentResponse)
 async def delineate_watershed_route(coordinates: CoordinateSchema):
     """
     Delimita la cuenca hidrográfica a partir de un punto dado (latitud, longitud).
@@ -14,6 +14,6 @@ async def delineate_watershed_route(coordinates: CoordinateSchema):
     """
     try:
         result = delineate_watershed(coordinates.latitude, coordinates.longitude)
-        return result
+        return CatchmentResponse(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
