@@ -248,3 +248,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,python
+
+
+# O si prefieres ignorar todos los archivos TIF en ciertos directorios
+data/**/*.tif
