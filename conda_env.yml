@@ -16,3 +16,5 @@ dependencies:
   - seaborn
   - geopandas
   - shapely
+  - bs4
+  - scrapy

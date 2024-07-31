@@ -17,12 +17,12 @@ def delineate_watershed(latitude, longitude):
     """
     try:
         # Leer el raster de elevación
-        grid = Grid.from_raster('D:/2024/USAL/TIDOP/E-Hydro/data/guadiana_wgs84.tif')
-        dem = grid.read_raster('D:/2024/USAL/TIDOP/E-Hydro/data/guadiana_wgs84.tif')
+        grid = Grid.from_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
+        dem = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
         # Determinar las direcciones de flujo D8 a partir del DEM
-        fdir = grid.read_raster('D:/2024/USAL/TIDOP/E-Hydro/data/flow_fdir.tif')
+        fdir = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_fdir.tif')
         # Acumulación de flujo
-        acc = grid.read_raster('D:/2024/USAL/TIDOP/E-Hydro/data/flow_accumulation.tif')
+        acc = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_accumulation.tif')
 
         dirmap = (64, 128, 1, 2, 4, 8, 16, 32)
         # Delimitar una cuenca

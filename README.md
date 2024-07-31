@@ -7,3 +7,10 @@ conda activate mygisapp
 conda env update -f conda_env.yml --prune
 
 ```
+
+### Ejecuta tu aplicacion FastAPI con:
+
+```
+uvicorn main:app --reload
+
+```
