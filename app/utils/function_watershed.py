@@ -1,14 +1,9 @@
-import matplotlib.pyplot as plt
 from pysheds.grid import Grid
-import numpy as np
-import seaborn as sns
-import matplotlib.colors as colors
-from shapely.geometry import LineString
 from math import radians, sin, cos, sqrt, atan2
 import geopandas as gpd
 import rasterio
 from rasterio.features import shapes
-from shapely.geometry import shape
+from shapely import geometry, ops
 import json
 
 def delineate_watershed(latitude, longitude):
@@ -21,16 +16,13 @@ def delineate_watershed(latitude, longitude):
              los puntos máximo y mínimo, y la longitud del río
     """
     try:
-        with rasterio.open('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif') as src:
-            dem = src.read(1)
-            transform = src.transform
-            # Leer el raster de elevación
-            grid = Grid.from_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
-            dem = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/guadiana_wgs84.tif')
-            # Determinar las direcciones de flujo D8 a partir del DEM
-            fdir = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_fdir.tif')
-            # Acumulación de flujo
-            acc = grid.read_raster('/home/tidop/2024/usal/tidop/E-HYDRO/data/flow_accumulation.tif')
+        # Leer el raster de elevación
+        grid = Grid.from_raster('D:/2024/USAL/TIDOP/E-Hydro/data/guadiana_wgs84.tif')
+        dem = grid.read_raster('D:/2024/USAL/TIDOP/E-Hydro/data/guadiana_wgs84.tif')
+        # Determinar las direcciones de flujo D8 a partir del DEM
+        fdir = grid.read_raster('D:/2024/USAL/TIDOP/E-Hydro/data/flow_fdir.tif')
+        # Acumulación de flujo
+        acc = grid.read_raster('D:/2024/USAL/TIDOP/E-Hydro/data/flow_accumulation.tif')
 
         dirmap = (64, 128, 1, 2, 4, 8, 16, 32)
         # Delimitar una cuenca
@@ -45,16 +37,21 @@ def delineate_watershed(latitude, longitude):
         # Recortar y mostrar la cuenca
         grid.clip_to(catch)
         clipped_catch = grid.view(catch)
-        clipped_catch = clipped_catch.astype('int32')
+        # raster to geojson
+        shapes = grid.polygonize()
+        catchment_polygon = ops.unary_union([geometry.shape(shape)for shape, value in shapes])
+        gdf = gpd.GeoDataFrame([{'geometry': catchment_polygon}], crs=grid.crs)
+        json_catchment = json.loads(gdf.to_json())
 
-        # convert raster to geojson
-        mask = clipped_catch != grid.nodata
-        clipped_catch = [shape(geom) for geom, value in shapes(clipped_catch, mask=mask, transform=transform) if value == 1]
-        clipped_catch = gpd.GeoDataFrame({'geometry': clipped_catch}, crs='EPSG:4326')
-        clipped_catch = json.loads(clipped_catch.to_json())
-    
+        # Calcular el área de la cuenca
+        gdf = gdf.to_crs(epsg=32630)  
+
+        # Calcular el área en metros cuadrados después de cambiar el CRS
+        areas_km2 = (gdf['geometry'].area)/10**6
+        areas_km2=areas_km2[0]
+        print("Áreas calculadas en kilometro cuadrados:", areas_km2)
         # Extraer la red de ríos
-        branches = grid.extract_river_network(fdir, acc > 50000, dirmap=dirmap)
+        branches = grid.extract_river_network(fdir, acc > 500, dirmap=dirmap)
         
         # Tamaño del píxel a partir de la transformación afín
         affine = grid.affine
@@ -115,13 +112,20 @@ def delineate_watershed(latitude, longitude):
         river_length = calculate_river_path_length(branches, max_point, min_point)
         print(f"Longitud del río: {river_length} metros")
 
+        # Calculo de la pendiente de la cuenca
+        slope = ((max_elevation - min_elevation) / river_length) * 100
+        print(f"Pendiente de la cuenca: {slope} %")
+
         return {
-            'catchment': branches,
+            'catchment': json_catchment,
+            'branches': branches,
+            'area': areas_km2,
             'max_elevation': max_elevation,
             'min_elevation': min_elevation,
             'max_point': max_point,
             'min_point': min_point,
-            'river_length': river_length
+            'river_length': river_length,
+            'slope': slope
         }
 
     except Exception as e:

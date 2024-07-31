@@ -14,3 +14,5 @@ dependencies:
   - numpy=1.25.2
   - matplotlib
   - seaborn
+  - geopandas
+  - shapely
